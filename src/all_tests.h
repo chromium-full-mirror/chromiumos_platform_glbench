@@ -13,6 +13,7 @@ TestBase* GetContextTest();
 TestBase* GetDrawSizeTest();
 TestBase* GetFboFillRateTest();
 TestBase* GetFillRateTest();
+TestBase* GetQueryGetTest();
 TestBase* GetReadPixelTest();
 TestBase* GetSwapTest();
 TestBase* GetTextureRebindTest();

@@ -16,12 +16,13 @@ GLint g_height = WINDOW_HEIGHT;
 
 std::unique_ptr<GLInterface> g_main_gl_interface;
 
-#ifdef USE_OPENGL
 namespace gl {
 #define F(fun, type) type fun = NULL;
 LIST_PROC_FUNCTIONS(F)
 #undef F
 };
+
+#ifdef USE_OPENGL
 #define GL_API WAFFLE_CONTEXT_OPENGL
 #else
 #define GL_API WAFFLE_CONTEXT_OPENGL_ES2
@@ -148,12 +149,10 @@ bool WaffleInterface::Init() {
   waffle_make_current(display_, surface_, context_);
   WAFFLE_CHECK_ERROR;
 
-#if defined(USE_OPENGL)
 #define F(fun, type) \
   fun = reinterpret_cast<type>(waffle_get_proc_address(#fun));
   LIST_PROC_FUNCTIONS(F)
 #undef F
-#endif
 
   return true;
 }

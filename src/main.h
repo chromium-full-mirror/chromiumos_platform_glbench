@@ -13,12 +13,22 @@
 #include <EGL/egl.h>
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
+
+#define LIST_PROC_FUNCTIONS(F)                                     \
+  F(glBeginQueryEXT, PFNGLBEGINQUERYEXTPROC)                       \
+  F(glEndQueryEXT, PFNGLENDQUERYEXTPROC)                           \
+  F(glDeleteQueriesEXT, PFNGLDELETEQUERIESEXTPROC)                 \
+  F(glGenQueriesEXT, PFNGLGENQUERIESEXTPROC)                       \
+  F(glGetQueryObjectuivEXT, PFNGLGETQUERYOBJECTUIVEXTPROC)
+
 #elif defined(USE_OPENGL)
 #include <GL/gl.h>
+#include <GL/glext.h>
 #include <GL/glx.h>
 
 #define LIST_PROC_FUNCTIONS(F)                                     \
   F(glAttachShader, PFNGLATTACHSHADERPROC)                         \
+  F(glBeginQuery, PFNGLBEGINQUERYPROC)                             \
   F(glBindBuffer, PFNGLBINDBUFFERPROC)                             \
   F(glBindBufferARB, PFNGLBINDBUFFERARBPROC)                       \
   F(glBindFramebuffer, PFNGLBINDFRAMEBUFFERPROC)                   \
@@ -33,18 +43,22 @@
   F(glDeleteBuffers, PFNGLDELETEBUFFERSPROC)                       \
   F(glDeleteFramebuffers, PFNGLDELETEFRAMEBUFFERSPROC)             \
   F(glDeleteProgram, PFNGLDELETEPROGRAMPROC)                       \
+  F(glDeleteQueries, PFNGLDELETEQUERIESPROC)                       \
   F(glDeleteRenderbuffers, PFNGLDELETERENDERBUFFERSPROC)           \
   F(glDeleteShader, PFNGLDELETESHADERPROC)                         \
   F(glDisableVertexAttribArray, PFNGLDISABLEVERTEXATTRIBARRAYPROC) \
   F(glEnableVertexAttribArray, PFNGLENABLEVERTEXATTRIBARRAYPROC)   \
+  F(glEndQuery, PFNGLENDQUERYPROC)                                 \
   F(glFramebufferRenderbuffer, PFNGLFRAMEBUFFERRENDERBUFFERPROC)   \
   F(glFramebufferTexture2D, PFNGLFRAMEBUFFERTEXTURE2DPROC)         \
   F(glGenBuffers, PFNGLGENBUFFERSPROC)                             \
+  F(glGenQueries, PFNGLGENQUERIESPROC)                             \
   F(glGenFramebuffers, PFNGLGENFRAMEBUFFERSPROC)                   \
   F(glGenRenderbuffers, PFNGLGENRENDERBUFFERSPROC)                 \
   F(glGetAttribLocation, PFNGLGETATTRIBLOCATIONPROC)               \
   F(glGetInfoLogARB, PFNGLGETPROGRAMINFOLOGPROC)                   \
   F(glGetProgramInfoLog, PFNGLGETPROGRAMINFOLOGPROC)               \
+  F(glGetQueryObjectuiv, PFNGLGETQUERYOBJECTUIVPROC)               \
   F(glGetShaderInfoLog, PFNGLGETSHADERINFOLOGPROC)                 \
   F(glGetUniformLocation, PFNGLGETUNIFORMLOCATIONPROC)             \
   F(glLinkProgram, PFNGLLINKPROGRAMPROC)                           \
@@ -60,6 +74,10 @@
   F(glXReleaseTexImageEXT, PFNGLXRELEASETEXIMAGEEXTPROC)           \
   F(glXSwapIntervalSGI, PFNGLXSWAPINTERVALSGIPROC)
 
+#else
+#error bad graphics backend
+#endif
+
 namespace gl {
 #define F(fun, type) extern type fun;
 LIST_PROC_FUNCTIONS(F)
@@ -67,10 +85,6 @@ LIST_PROC_FUNCTIONS(F)
 };
 
 using namespace gl;
-#else
-#error bad graphics backend
-#endif
-
 inline uint64_t GetUTime() {
   struct timeval tv;
   gettimeofday(&tv, NULL);
