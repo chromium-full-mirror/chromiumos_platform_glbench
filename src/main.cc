@@ -164,6 +164,7 @@ int main(int argc, char* argv[]) {
       glbench::GetFboFillRateTest(),
       glbench::GetDrawSizeTest(),
       glbench::GetTextureRebindTest(),
+      glbench::GetBufferStreamingTest(),
       glbench::GetBufferUploadTest(),
       glbench::GetBufferUploadSubTest(),
       glbench::GetQueryGetTest(),

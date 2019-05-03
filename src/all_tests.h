@@ -6,6 +6,7 @@ namespace glbench {
 class TestBase;
 
 TestBase* GetAttributeFetchShaderTest();
+TestBase* GetBufferStreamingTest();
 TestBase* GetBufferUploadTest();
 TestBase* GetBufferUploadSubTest();
 TestBase* GetClearTest();
