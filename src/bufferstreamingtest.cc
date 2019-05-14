@@ -95,6 +95,9 @@ bool BufferStreamingTest::TestSubDataOverwrite(uint64_t iterations) {
 }
 
 bool BufferStreamingTest::TestFunc(uint64_t iterations) {
+  // We should always start with a new buffer.
+  glBufferData(GL_ARRAY_BUFFER, buffer_size_, NULL, GL_STREAM_DRAW);
+
   switch (streaming_mode_) {
   case STREAMING_MODE_SUBDATA:
     return TestSubData(iterations);
@@ -118,28 +121,28 @@ bool BufferStreamingTest::Run() {
     "}";
   GLuint program = InitShaderProgram(vs, fs);
 
+  GLuint buffer;
+  glGenBuffers(1, &buffer);
+  glBindBuffer(GL_ARRAY_BUFFER, buffer);
+
   GLint attribute_index = glGetAttribLocation(program, "pos");
+  glVertexAttribPointer(attribute_index, 2, GL_FLOAT, GL_FALSE, 0, NULL);
   glEnableVertexAttribArray(attribute_index);
 
   glViewport(0, 0, g_width, g_height);
+  // Let's cull after VS such that the tests are not FS or I/O bound.
+  glEnable(GL_CULL_FACE);
 
   for (int i = 0; i < STREAMING_MODE_COUNT; i++) {
     streaming_mode_ = static_cast<enum streaming_mode>(i);
-
-    GLuint buffer;
-    glGenBuffers(1, &buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, buffer_size_, NULL, GL_STREAM_DRAW);
-    glVertexAttribPointer(attribute_index, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
     const std::string name = std::string(Name()) + "_" +
       CurrentStreamingModeName();
     RunTest(this, name.c_str(), data_size_, g_width, g_height, true);
     CHECK(!glGetError());
-
-    glDeleteBuffers(1, &buffer);
   }
 
+  glDeleteBuffers(1, &buffer);
   glDeleteProgram(program);
 
   return true;
