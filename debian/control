@@ -1,0 +1,24 @@
+Source: glbench
+Section: x11
+Priority: optional
+Maintainer: David Riley <davidriley@chromium.org>
+Build-Depends:
+ debhelper (>= 11),
+ libegl1-mesa-dev,
+ libgflags-dev,
+ libgl1-mesa-dev,
+ libgles2-mesa-dev,
+ libpng-dev,
+ libwaffle-1-0 (>= 1.6.0),
+ libwaffle-dev (>= 1.6.0),
+ pkg-config,
+Standards-Version: 4.1.3
+Homepage: https://chromium.googlesource.com/chromiumos/platform/glbench
+Vcs-Browser: https://chromium.googlesource.com/chromiumos/platform/glbench
+Vcs-Git: https://chromium.googlesource.com/chromiumos/platform/glbench.git
+
+Package: glbench
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: OpenGL benchmarking tool
+ Tool to measure OpenGL performance through a series of microbenchmarks.
