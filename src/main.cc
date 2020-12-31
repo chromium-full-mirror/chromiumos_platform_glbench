@@ -26,7 +26,7 @@ DEFINE_int32(
 DEFINE_string(tests,
               "",
               "Colon-separated list of tests to run; all tests if omitted.");
-DEFINE_string(blacklist, "", "colon-separated list of tests to disable");
+DEFINE_string(disabled_tests, "", "colon-separated list of tests to disable");
 DEFINE_bool(
     hasty,
     false,
@@ -140,7 +140,7 @@ int main(int argc, char* argv[]) {
     g_initial_temperature = GetMachineTemperature();
 
   vector<string> enabled_tests = SplitString(FLAGS_tests, ":", true);
-  vector<string> disabled_tests = SplitString(FLAGS_blacklist, ":", true);
+  vector<string> disabled_tests = SplitString(FLAGS_disabled_tests, ":", true);
 
   glbench::TestBase* tests[] = {
       // Please add new tests at the end of this list as tests are known to
