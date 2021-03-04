@@ -35,10 +35,10 @@ uint64_t TimeTest(TestBase* test, uint64_t iterations) {
   return time2 - time1;
 }
 
-// Target minimum iteration duration of 1s. This means the final/longest
-// iteration is between 1s and 2s and the machine is active for 2s to 4s.
+// Target minimum iteration duration of 0.4s. This means the final/longest
+// iteration is between 0.4s and 0.8s and the machine is active for 0.8s to 1.6s.
 // Notice as of March 2014 the BVT suite has a hard limit per job of 20 minutes.
-#define MIN_ITERATION_DURATION_US 1000000
+#define MIN_ITERATION_DURATION_US 400000
 
 #define MAX_TESTNAME 46
 
