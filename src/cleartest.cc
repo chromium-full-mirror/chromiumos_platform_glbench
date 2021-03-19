@@ -27,7 +27,7 @@ bool ClearTest::TestFunc(uint64_t iterations) {
   GLbitfield mask = mask_;
   glClear(mask);
   glFlush();  // Kick GPU as soon as possible
-  for (uint64_t i = 0; i < iterations - 1; ++i) {
+  for (uint64_t i = 0; i < iterations; ++i) {
     glClear(mask);
   }
   return true;

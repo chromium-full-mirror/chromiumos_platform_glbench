@@ -28,7 +28,7 @@ class ReadPixelTest : public TestBase {
 bool ReadPixelTest::TestFunc(uint64_t iterations) {
   glReadPixels(0, 0, g_width, g_height, GL_RGBA, GL_UNSIGNED_BYTE, pixels_);
   CHECK(glGetError() == 0);
-  for (uint64_t i = 0; i < iterations - 1; i++)
+  for (uint64_t i = 0; i < iterations; i++)
     glReadPixels(0, 0, g_width, g_height, GL_RGBA, GL_UNSIGNED_BYTE, pixels_);
   return true;
 }

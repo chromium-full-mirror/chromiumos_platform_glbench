@@ -175,7 +175,7 @@ bool DrawArraysTestFunc::TestFunc(uint64_t iterations) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   glFlush();
-  for (uint64_t i = 0; i < iterations - 1; ++i) {
+  for (uint64_t i = 0; i < iterations; ++i) {
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   }
   return true;
@@ -222,7 +222,7 @@ bool DrawElementsTestFunc::TestFunc(uint64_t iterations) {
   glClear(GL_COLOR_BUFFER_BIT);
   glDrawElements(GL_TRIANGLES, count_, GL_UNSIGNED_SHORT, 0);
   glFlush();
-  for (uint64_t i = 0; i < iterations - 1; ++i) {
+  for (uint64_t i = 0; i < iterations; ++i) {
     glDrawElements(GL_TRIANGLES, count_, GL_UNSIGNED_SHORT, 0);
   }
   return true;

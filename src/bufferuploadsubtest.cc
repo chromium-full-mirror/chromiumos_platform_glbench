@@ -35,7 +35,7 @@ class BufferUploadSubTest : public TestBase {
 
 bool BufferUploadSubTest::TestFunc(uint64_t iterations) {
   GLintptr offset = 0;
-  for (uint64_t i = 0; i < iterations - 1; ++i) {
+  for (uint64_t i = 0; i < iterations; ++i) {
     if (offset + size_ > buffer_size_) {
       offset = 0;
     }

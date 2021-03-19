@@ -41,7 +41,7 @@ class BufferUploadTest : public TestBase {
 };
 
 bool BufferUploadTest::TestFunc(uint64_t iterations) {
-  for (uint64_t i = 0; i < iterations - 1; ++i) {
+  for (uint64_t i = 0; i < iterations; ++i) {
     if (kNumberOfBuffers > 1) {
       glBindBuffer(target_, buffers_[i % kNumberOfBuffers]);
     }
