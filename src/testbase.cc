@@ -27,18 +27,18 @@ namespace glbench {
 uint64_t TimeTest(TestBase* test, uint64_t iterations) {
   g_main_gl_interface->SwapBuffers();
   glFinish();
-  uint64_t time1 = GetUTime();
+  uint64_t time1 = GetNTime();
   if (!test->TestFunc(iterations))
     return ~0;
   glFinish();
-  uint64_t time2 = GetUTime();
+  uint64_t time2 = GetNTime();
   return time2 - time1;
 }
 
 // Target minimum iteration duration of 0.4s. This means the final/longest
 // iteration is between 0.4s and 0.8s and the machine is active for 0.8s to 1.6s.
 // Notice as of March 2014 the BVT suite has a hard limit per job of 20 minutes.
-#define MIN_ITERATION_DURATION_US 400000
+#define MIN_ITERATION_DURATION_NS 400000000
 
 #define MAX_TESTNAME 46
 
@@ -71,7 +71,7 @@ double Bench(TestBase* test) {
 
   // We average the times for the last two runs to reduce noise. We could
   // sum up all runs but the initial measurements have high CPU overhead,
-  // while the last two runs are both on the order of MIN_ITERATION_DURATION_US.
+  // while the last two runs are both on the order of MIN_ITERATION_DURATION_NS.
   uint64_t iterations = 1;
   uint64_t iterations_prev = 0;
   uint64_t time = 0;
@@ -84,9 +84,11 @@ double Bench(TestBase* test) {
     // If we are running in hasty mode we will stop after a fraction of the
     // testing time and return much more noisy performance numbers. The MD5s
     // of the images should stay the same though.
-    if (time > MIN_ITERATION_DURATION_US / (::g_hasty ? 20.0 : 1.0))
+    // We divide by 1000.0 to convert from nanoseconds to microseconds for use
+    // by the caller to compute Mpixel/sec.
+    if (time > MIN_ITERATION_DURATION_NS / (::g_hasty ? 20.0 : 1.0))
       return (static_cast<double>(time + time_prev) /
-              (iterations + iterations_prev));
+              (iterations + iterations_prev)) / 1000.0;
 
     time_prev = time;
     iterations_prev = iterations;

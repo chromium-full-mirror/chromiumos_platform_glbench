@@ -92,6 +92,13 @@ inline uint64_t GetUTime() {
          1000000ULL * static_cast<uint64_t>(tv.tv_sec);
 }
 
+inline uint64_t GetNTime() {
+  struct timespec tv;
+  clock_gettime(CLOCK_MONOTONIC, &tv);
+  return static_cast<uint64_t>(tv.tv_nsec) +
+         1000000000ULL * static_cast<uint64_t>(tv.tv_sec);
+}
+
 extern bool g_verbose;
 extern bool g_hasty;
 extern GLint g_width;
