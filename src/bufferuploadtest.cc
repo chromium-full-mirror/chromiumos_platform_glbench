@@ -1,4 +1,4 @@
-// Copyright (c) 2018 The Chromium OS Authors. All rights reserved.
+// Copyright 2018 The Chromium OS Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -13,15 +13,12 @@ namespace {
 
 const int kNumberOfBuffers = 1;
 
-} // namespace
+}  // namespace
 
 class BufferUploadTest : public TestBase {
  public:
   BufferUploadTest()
-      : target_(GL_ARRAY_BUFFER),
-        size_(0),
-        usage_(GL_DYNAMIC_DRAW)
-  {
+      : target_(GL_ARRAY_BUFFER), size_(0), usage_(GL_DYNAMIC_DRAW) {
     memset(data_, 0, sizeof(data_));
   }
   virtual ~BufferUploadTest() {}
@@ -52,11 +49,11 @@ bool BufferUploadTest::TestFunc(uint64_t iterations) {
 
 bool BufferUploadTest::Run() {
   const GLenum usages[] = {GL_DYNAMIC_DRAW, GL_STATIC_DRAW};
-  const char * usage_names[] = {"dynamic", "static"};
+  const char* usage_names[] = {"dynamic", "static"};
   const GLenum targets[] = {GL_ARRAY_BUFFER, GL_ELEMENT_ARRAY_BUFFER};
-  const char * target_names[] = {"array", "element_array"};
-  const int sizes[] = {8, 12, 16, 32, 64, 128, 192, 256, 512, 1024, 2048,
-                       4096, 8192, 16384, 32768, 65536, 131072};
+  const char* target_names[] = {"array", "element_array"};
+  const int sizes[] = {8,    12,   16,   32,   64,    128,   192,   256,   512,
+                       1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072};
 
   for (unsigned int uidx = 0; uidx < arraysize(usages); uidx++) {
     usage_ = usages[uidx];
@@ -88,4 +85,4 @@ TestBase* GetBufferUploadTest() {
   return new BufferUploadTest;
 }
 
-} // namespace glbench
+}  // namespace glbench

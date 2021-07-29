@@ -36,8 +36,9 @@ uint64_t TimeTest(TestBase* test, uint64_t iterations) {
 }
 
 // Target minimum iteration duration of 0.4s. This means the final/longest
-// iteration is between 0.4s and 0.8s and the machine is active for 0.8s to 1.6s.
-// Notice as of March 2014 the BVT suite has a hard limit per job of 20 minutes.
+// iteration is between 0.4s and 0.8s and the machine is active for 0.8s
+// to 1.6s. Notice as of March 2014 the BVT suite has a hard limit per job of 20
+// minutes.
 #define MIN_ITERATION_DURATION_NS 400000000
 
 #define MAX_TESTNAME 46
@@ -88,7 +89,8 @@ double Bench(TestBase* test) {
     // by the caller to compute Mpixel/sec.
     if (time > MIN_ITERATION_DURATION_NS / (::g_hasty ? 20.0 : 1.0))
       return (static_cast<double>(time + time_prev) /
-              (iterations + iterations_prev)) / 1000.0;
+              (iterations + iterations_prev)) /
+             1000.0;
 
     time_prev = time;
     iterations_prev = iterations;

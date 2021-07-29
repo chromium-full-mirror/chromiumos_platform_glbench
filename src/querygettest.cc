@@ -19,21 +19,21 @@
 namespace glbench {
 
 class QueryGetTest : public TestBase {
-  public:
-    QueryGetTest() {}
-    virtual ~QueryGetTest() {}
+ public:
+  QueryGetTest() {}
+  virtual ~QueryGetTest() {}
 
-    virtual bool TestFunc(uint64_t iterations);
-    virtual bool Run();
-    virtual const char* Name() const { return "query_get"; }
-    virtual bool IsDrawTest() const { return true; }
-    virtual const char* Unit() const { return "us"; }
+  virtual bool TestFunc(uint64_t iterations);
+  virtual bool Run();
+  virtual const char* Name() const { return "query_get"; }
+  virtual bool IsDrawTest() const { return true; }
+  virtual const char* Unit() const { return "us"; }
 
-  private:
-    std::vector<GLuint> queries_;
-    GLenum target_;
+ private:
+  std::vector<GLuint> queries_;
+  GLenum target_;
 
-    DISALLOW_COPY_AND_ASSIGN(QueryGetTest);
+  DISALLOW_COPY_AND_ASSIGN(QueryGetTest);
 };
 
 bool QueryGetTest::TestFunc(uint64_t iterations) {
@@ -67,7 +67,7 @@ bool QueryGetTest::TestFunc(uint64_t iterations) {
 }
 
 bool QueryGetTest::Run() {
-  const char *exts = (const char *) glGetString(GL_EXTENSIONS);
+  const char* exts = (const char*)glGetString(GL_EXTENSIONS);
   if (!strstr(exts, "GL_ARB_occlusion_query2") &&
       !strstr(exts, "GL_EXT_occlusion_query_boolean")) {
     printf("# Warning: QueryGetTest could not find query extension(s).\n");
@@ -79,8 +79,7 @@ bool QueryGetTest::Run() {
   glGenQueries(queries_.size(), queries_.data());
 
   target_ = GL_ANY_SAMPLES_PASSED;
-  RunTest(this, "query_get_any_samples_passed",
-      1.0, g_width, g_height, false);
+  RunTest(this, "query_get_any_samples_passed", 1.0, g_width, g_height, false);
 
   glDeleteQueries(queries_.size(), queries_.data());
 
@@ -91,4 +90,4 @@ TestBase* GetQueryGetTest() {
   return new QueryGetTest;
 }
 
-} // namespace glbench
+}  // namespace glbench

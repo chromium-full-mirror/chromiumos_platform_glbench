@@ -39,10 +39,10 @@ void write_png_file(const char* file_name,
     row_pointers[y] = (png_byte*)malloc(4 * width);
     for (x = 0; x < width; x++) {
       png_byte* pixel = &(row_pointers[y][x * 4]);
-      pixel[0] = *(p);  // R
-      pixel[1] = *(p+1);  // G
-      pixel[2] = *(p+2);  // B
-      pixel[3] = *(p+3);  // A
+      pixel[0] = *(p);      // R
+      pixel[1] = *(p + 1);  // G
+      pixel[2] = *(p + 2);  // B
+      pixel[3] = *(p + 3);  // A
       p += 4;
     }
   }

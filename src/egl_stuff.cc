@@ -43,15 +43,14 @@ void EGLInterface::Cleanup() {
 
 XVisualInfo* EGLInterface::GetXVisual() {
   if (!config_) {
-    EGLint attribs[] = {
-      EGL_RED_SIZE, 1,
-      EGL_GREEN_SIZE, 1,
-      EGL_BLUE_SIZE, 1,
-      EGL_DEPTH_SIZE, 1,
-      EGL_STENCIL_SIZE, 1,
-      EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-      EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-      EGL_NONE};
+    EGLint attribs[] = {EGL_RED_SIZE, 1,
+                        EGL_GREEN_SIZE, 1,
+                        EGL_BLUE_SIZE, 1,
+                        EGL_DEPTH_SIZE, 1,
+                        EGL_STENCIL_SIZE, 1,
+                        EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+                        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+                        EGL_NONE};
 
     EGLNativeDisplayType native_display =
         static_cast<EGLNativeDisplayType>(g_xlib_display);

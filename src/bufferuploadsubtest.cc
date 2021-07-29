@@ -1,4 +1,4 @@
-// Copyright (c) 2018 The Chromium OS Authors. All rights reserved.
+// Copyright 2018 The Chromium OS Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -10,27 +10,24 @@
 namespace glbench {
 
 class BufferUploadSubTest : public TestBase {
-  public:
-    BufferUploadSubTest()
-      : buffer_size_(1572864),
-      target_(GL_ARRAY_BUFFER),
-      size_(0)
-  {
+ public:
+  BufferUploadSubTest()
+      : buffer_size_(1572864), target_(GL_ARRAY_BUFFER), size_(0) {
     memset(data_, 0, sizeof(data_));
   }
-    virtual ~BufferUploadSubTest() {}
-    virtual bool TestFunc(uint64_t iterations);
-    virtual bool Run();
-    virtual const char* Name() const { return "buffer_upload_sub"; }
-    virtual bool IsDrawTest() const { return false; }
-    virtual const char* Unit() const { return "mbytes_sec"; }
+  virtual ~BufferUploadSubTest() {}
+  virtual bool TestFunc(uint64_t iterations);
+  virtual bool Run();
+  virtual const char* Name() const { return "buffer_upload_sub"; }
+  virtual bool IsDrawTest() const { return false; }
+  virtual const char* Unit() const { return "mbytes_sec"; }
 
-  private:
-    GLsizeiptr buffer_size_;
-    GLenum target_;
-    GLsizeiptr size_;
-    GLbyte data_[256 * 1024];
-    DISALLOW_COPY_AND_ASSIGN(BufferUploadSubTest);
+ private:
+  GLsizeiptr buffer_size_;
+  GLenum target_;
+  GLsizeiptr size_;
+  GLbyte data_[256 * 1024];
+  DISALLOW_COPY_AND_ASSIGN(BufferUploadSubTest);
 };
 
 bool BufferUploadSubTest::TestFunc(uint64_t iterations) {
@@ -47,11 +44,11 @@ bool BufferUploadSubTest::TestFunc(uint64_t iterations) {
 
 bool BufferUploadSubTest::Run() {
   const GLenum usages[] = {GL_DYNAMIC_DRAW, GL_STATIC_DRAW};
-  const char * usage_names[] = {"dynamic", "static"};
+  const char* usage_names[] = {"dynamic", "static"};
   const GLenum targets[] = {GL_ARRAY_BUFFER, GL_ELEMENT_ARRAY_BUFFER};
-  const char * target_names[] = {"array", "element_array"};
-  const int sizes[] = {8, 12, 16, 32, 64, 128, 192, 256, 512, 1024, 2048,
-                        4096, 8192, 16384, 32768, 65536, 131072};
+  const char* target_names[] = {"array", "element_array"};
+  const int sizes[] = {8,    12,   16,   32,   64,    128,   192,   256,   512,
+                       1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072};
 
   for (unsigned int uidx = 0; uidx < arraysize(usages); uidx++) {
     GLenum usage = usages[uidx];
@@ -67,7 +64,7 @@ bool BufferUploadSubTest::Run() {
         glBufferData(target_, buffer_size_, NULL, usage);
 
         std::string name = std::string(Name()) + "_" + usage_names[uidx] + "_" +
-                            target_names[tidx] + "_" + IntToString(size_);
+                           target_names[tidx] + "_" + IntToString(size_);
         RunTest(this, name.c_str(), sizes[sidx], g_width, g_height, true);
         CHECK(!glGetError());
       }
@@ -83,4 +80,4 @@ TestBase* GetBufferUploadSubTest() {
   return new BufferUploadSubTest;
 }
 
-} // namespace glbench
+}  // namespace glbench

@@ -20,19 +20,17 @@ class TextureRebindTest : public TextureTest {
   virtual bool IsTextureUploadTest() const { return false; }
 };
 
-
-bool TextureRebindTest::TextureMetaDataInit(){
-    kTexelFormats.push_back(GL_RGBA);
-    kTexelFormatNames[GL_RGBA] = "rgba";
-    kTexelFormatSizes[GL_RGBA] = 4;
-    kFlavors[TEX_IMAGE] = "teximage2d";
-    return true;
+bool TextureRebindTest::TextureMetaDataInit() {
+  kTexelFormats.push_back(GL_RGBA);
+  kTexelFormatNames[GL_RGBA] = "rgba";
+  kTexelFormatSizes[GL_RGBA] = 4;
+  kFlavors[TEX_IMAGE] = "teximage2d";
+  return true;
 }
 
 bool TextureRebindTest::TestFunc(uint64_t iterations) {
   for (uint64_t i = 0; i < iterations; ++i) {
-    for (uint64_t texture_idx = 0;
-         texture_idx < kNumberOfTextures;
+    for (uint64_t texture_idx = 0; texture_idx < kNumberOfTextures;
          texture_idx++) {
       glBindTexture(GL_TEXTURE_2D, textures_[texture_idx]);
       glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

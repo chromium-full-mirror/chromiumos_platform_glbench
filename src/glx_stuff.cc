@@ -15,7 +15,7 @@ namespace gl {
 #define F(fun, type) type fun = NULL;
 LIST_PROC_FUNCTIONS(F)
 #undef F
-};
+};  // namespace gl
 
 #ifndef GLX_MESA_swap_control
 typedef GLint (*PFNGLXSWAPINTERVALMESAPROC)(unsigned interval);

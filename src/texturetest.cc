@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 #include "texturetest.h"
-#include "arraysize.h"
 #include <assert.h>
+#include "arraysize.h"
 
 namespace glbench {
 
@@ -84,7 +84,7 @@ bool TextureTest::Run() {
     texel_gl_format_ = fmt;
     std::string texel_gl_format_name = kTexelFormatNames.at(texel_gl_format_);
     unsigned int texel_size = kTexelFormatSizes[texel_gl_format_];
-    for (auto flv : kFlavors){
+    for (auto flv : kFlavors) {
       flavor_ = flv.first;
       std::string flavor_name = flv.second;
 
@@ -95,8 +95,7 @@ bool TextureTest::Run() {
           continue;
 
         std::string name = std::string(Name()) + "_" + texel_gl_format_name +
-                           "_" + flavor_name + "_" +
-                           IntToString(sizes[j]);
+                           "_" + flavor_name + "_" + IntToString(sizes[j]);
 
         width_ = height_ = sizes[j];
         const unsigned int buffer_size = width_ * height_ * texel_size;
@@ -123,9 +122,8 @@ bool TextureTest::Run() {
             glBindTexture(GL_TEXTURE_2D, textures_[i]);
             switch (flavor_) {
               case TEX_IMAGE:
-                glTexImage2D(GL_TEXTURE_2D, 0, texel_gl_format_,
-                             width_, height_, 0,
-                             texel_gl_format_, GL_UNSIGNED_BYTE,
+                glTexImage2D(GL_TEXTURE_2D, 0, texel_gl_format_, width_,
+                             height_, 0, texel_gl_format_, GL_UNSIGNED_BYTE,
                              pixels_[i % kNumberOfTextures].get());
                 break;
               case TEX_SUBIMAGE:

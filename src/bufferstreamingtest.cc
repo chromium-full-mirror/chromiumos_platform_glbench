@@ -10,58 +10,56 @@
 namespace glbench {
 
 class BufferStreamingTest : public TestBase {
-  public:
-    BufferStreamingTest()
-      : buffer_size_(1 * 1024 * 1024)
-    {
-      // clockwise such that the triangle is culled
-      const GLfloat vertices[3][2] = {
-        { 0.0f, 0.0f },
-        { 0.0f, 1.0f },
-        { 1.0f, 0.0f },
-      };
-
-      memcpy(data_, vertices, sizeof(vertices));
-      data_size_ = sizeof(vertices);
-    }
-
-    virtual ~BufferStreamingTest() {}
-    virtual bool TestFunc(uint64_t iterations);
-    virtual bool Run();
-    virtual const char* Name() const { return "buffer_streaming"; }
-    virtual bool IsDrawTest() const { return false; }
-    virtual const char* Unit() const { return "mbytes_sec"; }
-
-  private:
-    enum streaming_mode {
-      STREAMING_MODE_SUBDATA_OVERWRITE,
-      STREAMING_MODE_SUBDATA,
-
-      STREAMING_MODE_COUNT,
+ public:
+  BufferStreamingTest() : buffer_size_(1 * 1024 * 1024) {
+    // clockwise such that the triangle is culled
+    const GLfloat vertices[3][2] = {
+        {0.0f, 0.0f},
+        {0.0f, 1.0f},
+        {1.0f, 0.0f},
     };
 
-    const GLsizeiptr buffer_size_;
+    memcpy(data_, vertices, sizeof(vertices));
+    data_size_ = sizeof(vertices);
+  }
 
-    GLbyte data_[sizeof(GLfloat) * 2 * 3];
-    GLsizeiptr data_size_;
+  virtual ~BufferStreamingTest() {}
+  virtual bool TestFunc(uint64_t iterations);
+  virtual bool Run();
+  virtual const char* Name() const { return "buffer_streaming"; }
+  virtual bool IsDrawTest() const { return false; }
+  virtual const char* Unit() const { return "mbytes_sec"; }
 
-    enum streaming_mode streaming_mode_;
+ private:
+  enum streaming_mode {
+    STREAMING_MODE_SUBDATA_OVERWRITE,
+    STREAMING_MODE_SUBDATA,
 
-    const char *CurrentStreamingModeName() const {
-      switch (streaming_mode_) {
+    STREAMING_MODE_COUNT,
+  };
+
+  const GLsizeiptr buffer_size_;
+
+  GLbyte data_[sizeof(GLfloat) * 2 * 3];
+  GLsizeiptr data_size_;
+
+  enum streaming_mode streaming_mode_;
+
+  const char* CurrentStreamingModeName() const {
+    switch (streaming_mode_) {
       case STREAMING_MODE_SUBDATA:
         return "subdata";
       case STREAMING_MODE_SUBDATA_OVERWRITE:
         return "subdata_overwrite";
       default:
         return "invalid";
-      }
     }
+  }
 
-    bool TestSubData(uint64_t iterations);
-    bool TestSubDataOverwrite(uint64_t iterations);
+  bool TestSubData(uint64_t iterations);
+  bool TestSubDataOverwrite(uint64_t iterations);
 
-    DISALLOW_COPY_AND_ASSIGN(BufferStreamingTest);
+  DISALLOW_COPY_AND_ASSIGN(BufferStreamingTest);
 };
 
 bool BufferStreamingTest::TestSubData(uint64_t iterations) {
@@ -99,26 +97,26 @@ bool BufferStreamingTest::TestFunc(uint64_t iterations) {
   glBufferData(GL_ARRAY_BUFFER, buffer_size_, NULL, GL_STREAM_DRAW);
 
   switch (streaming_mode_) {
-  case STREAMING_MODE_SUBDATA:
-    return TestSubData(iterations);
-  case STREAMING_MODE_SUBDATA_OVERWRITE:
-    return TestSubDataOverwrite(iterations);
-  default:
-    return false;
+    case STREAMING_MODE_SUBDATA:
+      return TestSubData(iterations);
+    case STREAMING_MODE_SUBDATA_OVERWRITE:
+      return TestSubDataOverwrite(iterations);
+    default:
+      return false;
   }
 }
 
 bool BufferStreamingTest::Run() {
   const char vs[] =
-    "attribute vec4 pos;"
-    "void main() {"
-    "  gl_Position = pos;"
-    "}";
+      "attribute vec4 pos;"
+      "void main() {"
+      "  gl_Position = pos;"
+      "}";
 
   const char fs[] =
-    "void main() {"
-    "  gl_FragColor = vec4(1.0);"
-    "}";
+      "void main() {"
+      "  gl_FragColor = vec4(1.0);"
+      "}";
   GLuint program = InitShaderProgram(vs, fs);
 
   GLuint buffer;
@@ -136,8 +134,8 @@ bool BufferStreamingTest::Run() {
   for (int i = 0; i < STREAMING_MODE_COUNT; i++) {
     streaming_mode_ = static_cast<enum streaming_mode>(i);
 
-    const std::string name = std::string(Name()) + "_" +
-      CurrentStreamingModeName();
+    const std::string name =
+        std::string(Name()) + "_" + CurrentStreamingModeName();
     RunTest(this, name.c_str(), data_size_, g_width, g_height, true);
     CHECK(!glGetError());
   }
@@ -152,4 +150,4 @@ TestBase* GetBufferStreamingTest() {
   return new BufferStreamingTest;
 }
 
-} // namespace glbench
+}  // namespace glbench

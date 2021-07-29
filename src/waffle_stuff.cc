@@ -20,7 +20,7 @@ namespace gl {
 #define F(fun, type) type fun = NULL;
 LIST_PROC_FUNCTIONS(F)
 #undef F
-};
+};  // namespace gl
 
 #ifdef USE_OPENGL
 #define GL_API WAFFLE_CONTEXT_OPENGL

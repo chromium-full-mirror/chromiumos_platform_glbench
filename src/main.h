@@ -14,11 +14,11 @@
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 
-#define LIST_PROC_FUNCTIONS(F)                                     \
-  F(glBeginQueryEXT, PFNGLBEGINQUERYEXTPROC)                       \
-  F(glEndQueryEXT, PFNGLENDQUERYEXTPROC)                           \
-  F(glDeleteQueriesEXT, PFNGLDELETEQUERIESEXTPROC)                 \
-  F(glGenQueriesEXT, PFNGLGENQUERIESEXTPROC)                       \
+#define LIST_PROC_FUNCTIONS(F)                     \
+  F(glBeginQueryEXT, PFNGLBEGINQUERYEXTPROC)       \
+  F(glEndQueryEXT, PFNGLENDQUERYEXTPROC)           \
+  F(glDeleteQueriesEXT, PFNGLDELETEQUERIESEXTPROC) \
+  F(glGenQueriesEXT, PFNGLGENQUERIESEXTPROC)       \
   F(glGetQueryObjectuivEXT, PFNGLGETQUERYOBJECTUIVEXTPROC)
 
 #elif defined(USE_OPENGL)
@@ -82,7 +82,7 @@ namespace gl {
 #define F(fun, type) extern type fun;
 LIST_PROC_FUNCTIONS(F)
 #undef F
-};
+};  // namespace gl
 
 using namespace gl;
 inline uint64_t GetUTime() {
