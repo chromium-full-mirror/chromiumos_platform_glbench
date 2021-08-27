@@ -23,7 +23,7 @@ const char* kGlesHeader =
     "precision highp float;\n"
     "#endif\n";
 
-FilePath* g_base_path = new FilePath();
+FilePath* g_runtime_path = new FilePath();
 double g_initial_temperature = -1000.0;
 std::string autotest_temperature_script =
     "/usr/local/autotest/bin/temperature.py";
@@ -32,17 +32,17 @@ DEFINE_string(TEMPERATURE_SCRIPT_PATH,
               "The path to temperature measurement executable.");
 
 // Sets the base path for MmapFile to `dirname($argv0)`/$relative.
-void SetBasePathFromArgv0(const char* argv0, const char* relative) {
-  if (g_base_path) {
-    delete g_base_path;
+void SetRuntimePathFromArgv0(const char* argv0, const char* relative) {
+  if (g_runtime_path) {
+    delete g_runtime_path;
   }
   FilePath argv0_path = FilePath(argv0).DirName();
   FilePath base_path = relative ? argv0_path.Append(relative) : argv0_path;
-  g_base_path = new FilePath(base_path);
+  g_runtime_path = new FilePath(base_path);
 }
 
 void* MmapFile(const char* name, size_t* length) {
-  FilePath filename = g_base_path->Append(name);
+  FilePath filename = g_runtime_path->Append(name);
   int fd = open(filename.value().c_str(), O_RDONLY);
   if (fd == -1)
     return NULL;

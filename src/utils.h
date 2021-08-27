@@ -21,7 +21,7 @@
 
 extern double g_initial_temperature;
 
-void SetBasePathFromArgv0(const char* argv0, const char* relative);
+void SetRuntimePathFromArgv0(const char* argv0, const char* relative);
 void* MmapFile(const char* name, size_t* length);
 
 // Returns temperature of system before testing started. It is used as a

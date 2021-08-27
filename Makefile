@@ -18,4 +18,6 @@ all clean:
 .PHONY: install
 install:
 	mkdir -p $(BINDIR)
+	mkdir -p $(BINDIR)/runtime
 	$(INSTALL) glbench windowmanagertest $(BINDIR)
+	$(INSTALL) -D runtime/* -t $(BINDIR)/runtime

@@ -9,6 +9,7 @@
 #include <ctime>
 
 #include "arraysize.h"
+#include "filepath.h"
 #include "glinterface.h"
 #include "main.h"
 #include "utils.h"
@@ -19,10 +20,13 @@
 using std::string;
 using std::vector;
 
+extern FilePath *g_runtime_path;
+
 DEFINE_int32(
     duration,
     0,
     "Run all tests again and again in a loop for at least this many seconds.");
+DEFINE_string(runtime_dir, "", "Path to the runtime directories.");
 DEFINE_string(tests,
               "",
               "Colon-separated list of tests to run; all tests if omitted.");
@@ -105,8 +109,13 @@ bool PassesSanityCheck(void) {
 }
 
 int main(int argc, char* argv[]) {
-  SetBasePathFromArgv0(argv[0], "src");
   gflags::ParseCommandLineFlags(&argc, &argv, false);
+
+  if (FLAGS_runtime_dir.size() == 0) {
+    SetRuntimePathFromArgv0(argv[0], "runtime");
+  } else {
+      g_runtime_path = new FilePath(FLAGS_runtime_dir);
+  }
 
   g_verbose = FLAGS_verbose;
 
