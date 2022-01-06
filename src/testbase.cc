@@ -170,6 +170,7 @@ void RunTest(TestBase* test,
   int name_length = strlen(testname);
   if (name_length > MAX_TESTNAME)
     printf("# Warning: adjust string formatting to length = %d\n", name_length);
+  printDateTime();
   // Results are marked using a leading '@RESULT: ' to allow parsing.
   printf("@RESULT: %-*s = %10.2f %-15s [%s]\n", MAX_TESTNAME, testname, value,
          test->Unit(), name_png);

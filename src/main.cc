@@ -79,15 +79,6 @@ bool test_is_disabled(glbench::TestBase* test,
   return false;
 }
 
-void printDateTime(void) {
-  struct tm* ttime;
-  time_t tm = time(0);
-  char time_string[64];
-  ttime = localtime(&tm);
-  strftime(time_string, 63, "%c", ttime);
-  printf("# DateTime: %s\n", time_string);
-}
-
 bool PassesSanityCheck(void) {
   GLint size[2];
   glGetIntegerv(GL_MAX_VIEWPORT_DIMS, size);

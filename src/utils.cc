@@ -61,6 +61,18 @@ void* MmapFile(const char* name, size_t* length) {
   return mmap_ptr;
 }
 
+void printDateTime() {
+  char            fmt[64], time_string[64];
+  struct timeval  tv;
+  struct tm       *tm;
+  gettimeofday(&tv, NULL);
+  if((tm = localtime(&tv.tv_sec)) != NULL){
+    strftime(fmt, sizeof fmt, "%a %b %e %H:%M:%S.%%06u %Y", tm);
+    snprintf(time_string, sizeof time_string, fmt, tv.tv_usec);
+    printf("# DateTime: %s\n", time_string);
+  }
+}
+
 bool read_int_from_file(FilePath filename, int* value) {
   FILE* fd = fopen(filename.value().c_str(), "r");
   if (!fd) {

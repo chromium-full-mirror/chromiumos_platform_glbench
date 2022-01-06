@@ -23,6 +23,7 @@ extern double g_initial_temperature;
 
 void SetRuntimePathFromArgv0(const char* argv0, const char* relative);
 void* MmapFile(const char* name, size_t* length);
+void printDateTime();
 
 // Returns temperature of system before testing started. It is used as a
 // reference for keeping the machine cool.
