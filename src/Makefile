@@ -1,4 +1,4 @@
-# Copyright (c) 2011 The Chromium OS Authors. All rights reserved.
+# Copyright 2011 The ChromiumOS Authors
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
@@ -35,7 +35,10 @@ SOURCES_GL_BENCH += bufferstreamingtest.cc
 SOURCES_GL_BENCH += bufferuploadtest.cc bufferuploadsubtest.cc
 SOURCES_GL_BENCH += querygettest.cc
 
-SOURCES_WINDOWMANAGERTEST = windowmanagertest.cc utils.cc waffle_stuff.cc filepath.cc
+SOURCES_COMPOSITORTEST = compositortest.cc workload.cc
+
+SOURCES_WINDOWMANAGERTEST = windowmanagertest.cc utils.cc waffle_stuff.cc \
+    filepath.cc
 
 PKG_CONFIG ?= pkg-config
 PC_DEPS = libpng
@@ -47,6 +50,7 @@ CPPFLAGS += $(PC_CFLAGS)
 LDLIBS = $(PC_LIBS) -lgflags
 
 GL_BENCH = ../glbench
+COMPOSITORTEST = ../compositortest
 WINDOWMANAGERTEST = ../windowmanagertest
 
 PLATFORM_PKGS = waffle-1
@@ -59,24 +63,28 @@ PLATFORM_LIBS = $(shell $(PKG_CONFIG) --libs $(PLATFORM_PKGS))
 
 ifneq ($(USE_GLES),)
 CPPFLAGS += -DUSE_OPENGLES
-LDLIBS += -lGLESv2 -lEGL
+LDLIBS += -lGLESv2 -lepoxy -lEGL
 else
 CPPFLAGS += -DUSE_OPENGL
-LDLIBS += -lGL
+LDLIBS += -lGL -lepoxy
 endif
 
 SOURCES_ALL = $(sort $(SOURCES_GL_BENCH) \
+                     $(SOURCES_COMPOSITORTEST) \
                      $(SOURCES_WINDOWMANAGERTEST))
 
 OBJS_GL_BENCH = $(SOURCES_GL_BENCH:.cc=.o)
+OBJS_COMPOSITORTEST = $(SOURCES_COMPOSITORTEST:.cc=.o)
 OBJS_WINDOWMANAGERTEST = $(SOURCES_WINDOWMANAGERTEST:.cc=.o)
 OBJS_ALL = $(SOURCES_ALL:.cc=.o)
 DEPS_ALL = $(SOURCES_ALL:.cc=.d)
 
 .PHONY: all clean
 
-EXE_PORTABLE = $(GL_BENCH) $(WINDOWMANAGERTEST)
-OBJ_PORTABLE = $(sort $(OBJS_GL_BENCH) $(OBJS_WINDOWMANAGERTEST))
+EXE_PORTABLE = $(GL_BENCH) $(COMPOSITORTEST) $(WINDOWMANAGERTEST)
+OBJ_PORTABLE = $(sort $(OBJS_GL_BENCH) \
+                      $(OBJS_COMPOSITORTEST) \
+                      $(OBJS_WINDOWMANAGERTEST))
 
 all:: $(EXE_PORTABLE)
 ifneq ($(USE_X),)
@@ -84,10 +92,11 @@ all:: $(EXE_X_ONLY)
 endif
 
 $(GL_BENCH): $(OBJS_GL_BENCH)
+$(COMPOSITORTEST): $(OBJS_COMPOSITORTEST)
 $(WINDOWMANAGERTEST): $(OBJS_WINDOWMANAGERTEST)
 
 clean:
-	$(RM) $(GL_BENCH) $(WINDOWMANAGERTEST)
+	$(RM) $(GL_BENCH) $(COMPOSITORTEST) $(WINDOWMANAGERTEST)
 	$(RM) $(OBJS_ALL) $(DEPS_ALL)
 	$(RM) *.o *.d .version
 

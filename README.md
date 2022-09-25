@@ -62,3 +62,25 @@ When that bug is closed the directory should be moved to *./ref_images/glbench_f
 To push out new reference images place them in the appropriate directories
 (create a new bug if needed) and run *./update_glbench_image_filelists.sh* to
 update the image filelists.
+
+# compositortest
+
+CompositorTest is another binary generated in the glbench directory. It runs a
+small OpenGL or OpenGL ES shader program and optionally sleeps for some time
+before swapping buffers. The time between swaps is logged to a file and
+processed for reporting in a tast test. We can see from this simiulated work
+load how much time can be spent processing a frame before it gets dropped.
+
+# example
+
+./compositortest --fullscreen true --gpu_workload_ms 15
+Platform OpenGL version: OpenGL ES 3.2 Mesa 22.1.4 (git-d3e5726da1)
+Update num quads: 144863
+calibrating: gpu_elapsed_time: 14.9717 ms
+Finished calibrating workload.
+[..]
+frame 998: cpu_elapsed_time: 16.1118 ms
+frame 998: gpu_elapsed_time: 14.9748 ms
+frame 999: cpu_elapsed_time: 16.1824 ms
+frame 999: gpu_elapsed_time: 14.9726 ms
+Avg: 62 fps for 16 secs. 1000 frames rendered.
