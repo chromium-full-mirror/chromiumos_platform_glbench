@@ -1,4 +1,4 @@
-// Copyright (c) 2010 The Chromium OS Authors. All rights reserved.
+// Copyright 2010 The ChromiumOS Authors
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -135,6 +135,7 @@ int main(int argc, char* argv[]) {
       static_cast<float>(FLAGS_screenshot2_sec),
       static_cast<float>(FLAGS_cooldown_sec), 0};
 
+  int screenshot_failure = 0;
   do {
     // Draw
     glClear(GL_COLOR_BUFFER_BIT);
@@ -153,10 +154,14 @@ int main(int argc, char* argv[]) {
     // State change. Perform action.
     switch (state) {
       case kStateScreenShot1:
-        system(FLAGS_screenshot1_cmd.c_str());
+        if (system(FLAGS_screenshot1_cmd.c_str()) != 0) {
+          screenshot_failure ++;
+        }
         break;
       case kStateScreenShot2:
-        system(FLAGS_screenshot2_cmd.c_str());
+        if (system(FLAGS_screenshot2_cmd.c_str()) != 0) {
+          screenshot_failure ++;
+        }
         break;
       default:
         break;
@@ -170,5 +175,9 @@ int main(int argc, char* argv[]) {
 
   glDeleteTextures(1, &texture);
   g_main_gl_interface->Cleanup();
+
+  if (screenshot_failure != 0) {
+    return 1;
+  }
   return 0;
 }
