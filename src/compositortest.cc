@@ -201,10 +201,13 @@ int main(int argc, char* argv[]) {
       target_refresh_rate = false;
     } else if (arg == "--sleep-cpu-microseconds" && (i + 1) < argc) {
       sleep_cpu_microseconds = std::stoi(argv[i + 1]);
+      ++i;
     } else if (arg == "--display-scale" && (i + 1) < argc) {
       display_scale = std::stod(argv[i + 1]);
+      ++i;
     } else if (arg == "--gpu-workload-ms" && (i + 1) < argc) {
       gpu_workload_ms = std::stod(argv[i + 1]);
+      ++i;
     } else {
       std::cout << "Error: Parsing command line - check args: "
                 << arg << std::endl;
