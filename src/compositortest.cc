@@ -143,7 +143,8 @@ void CreateContext(
   struct waffle_display **display,
   struct waffle_config **config,
   struct waffle_window **window,
-  struct waffle_context **ctx) {
+  struct waffle_context **ctx,
+  int swap_interval) {
   const int32_t init_attrs[] = {
       WAFFLE_PLATFORM, PLATFORM_TYPE,
       0,
@@ -171,6 +172,13 @@ void CreateContext(
   waffle_window_show(*window);
   *ctx = waffle_context_create(*config, NULL);
   waffle_make_current(*display, *window, *ctx);
+#if defined (USE_OPENGLES)
+  eglSwapInterval(waffle_display_get_native(*display)->null->egl_display,
+      swap_interval);
+#elif defined (USE_OPENGL)
+  glXSwapIntervalEXT(waffle_display_get_native(*display)->glx->xlib_display,
+      glXGetCurrentDrawable(), swap_interval);
+#endif
 }
 
 int main(int argc, char* argv[]) {
@@ -184,6 +192,9 @@ int main(int argc, char* argv[]) {
   int sleep_cpu_microseconds = 0;
   double display_scale = 1.0;
   double gpu_workload_ms = 1000 / 60.0;
+
+  // Enable or disable vsync
+  int swap_interval = vsync ? 1 : 0;
 
   for (int i = 1; i < argc; ++i) {
     std::string arg = argv[i];
@@ -229,7 +240,7 @@ int main(int argc, char* argv[]) {
   struct waffle_config *config;
   struct waffle_window *window;
   struct waffle_context *ctx;
-  CreateContext(&display, &config, &window, &ctx);
+  CreateContext(&display, &config, &window, &ctx, swap_interval);
 
   int error = 0;
   auto shader_program = CreateShader(&error);
