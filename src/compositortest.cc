@@ -182,8 +182,6 @@ void CreateContext(
 }
 
 int main(int argc, char* argv[]) {
-  // TODO(mrfemi): Check for GLX_MESA_swap_control extension and set vsync
-  // appropriately.
   // TODO(mrfemi): parse workload scale from command line. At least as a
   // parameter. (0.99f)
   bool vsync = true;
@@ -192,9 +190,6 @@ int main(int argc, char* argv[]) {
   int sleep_cpu_microseconds = 0;
   double display_scale = 1.0;
   double gpu_workload_ms = 1000 / 60.0;
-
-  // Enable or disable vsync
-  int swap_interval = vsync ? 1 : 0;
 
   for (int i = 1; i < argc; ++i) {
     std::string arg = argv[i];
@@ -240,6 +235,8 @@ int main(int argc, char* argv[]) {
   struct waffle_config *config;
   struct waffle_window *window;
   struct waffle_context *ctx;
+  // Enable or disable vsync
+  int swap_interval = vsync ? 1 : 0;
   CreateContext(&display, &config, &window, &ctx, swap_interval);
 
   int error = 0;
