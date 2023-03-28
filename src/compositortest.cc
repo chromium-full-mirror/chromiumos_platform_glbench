@@ -9,6 +9,7 @@
 #include <iomanip>
 #include <iostream>
 #include <string>
+#include <thread>
 #include <vector>
 #include <waffle.h>
 
@@ -62,7 +63,9 @@ const std::string kVertexShader = R"STRING(
 layout (location = 0) in vec2 pos;
 layout (location = 1) uniform float mod_size;
 layout (location = 2) uniform float line_idx;
+layout (location = 3) uniform float start_size;
 out vec2 instance_color;
+out float blue_intensity;
 void main()
 {
     float gli = float(gl_InstanceID);
@@ -71,10 +74,15 @@ void main()
     float vx = 0.5f - l / mod_size;
     float vy = 0.5f - h / mod_size;
     float a = mod(line_idx, mod_size);
+    blue_intensity = mod_size / start_size;
+    if (blue_intensity >= 1.0f) {
+      blue_intensity = 1.0f;
+    }
     if (abs(a - l) < mod_size * 0.05) {
       instance_color = vec2(1, 1);
     } else {
       instance_color = vec2(vx + 0.5f, vy + 0.5f);
+      blue_intensity = 0.4f;
     }
 
     gl_Position =
@@ -84,10 +92,11 @@ void main()
 
 const std::string kFragmentShader = R"STRING(
 in vec2 instance_color;
+in float blue_intensity;
 out vec4 frag_color;
 void main()
 {
-  frag_color = vec4(instance_color.x, instance_color.y, 0.4f, 1.0f);
+  frag_color = vec4(instance_color.x, instance_color.y, blue_intensity, 1.0f);
 }
 )STRING";
 
@@ -144,7 +153,9 @@ void CreateContext(
   struct waffle_config **config,
   struct waffle_window **window,
   struct waffle_context **ctx,
-  int swap_interval) {
+  int swap_interval,
+  int window_width,
+  int window_height) {
   const int32_t init_attrs[] = {
       WAFFLE_PLATFORM, PLATFORM_TYPE,
       0,
@@ -160,8 +171,6 @@ void CreateContext(
                              WAFFLE_STENCIL_SIZE, 1,
                              WAFFLE_DOUBLE_BUFFERED, true,
                              0};
-  const int32_t window_width = 640;
-  const int32_t window_height = 480;
 
   waffle_init(init_attrs);
   *display = waffle_display_connect(NULL);
@@ -187,7 +196,10 @@ int main(int argc, char* argv[]) {
   bool vsync = true;
   bool fullscreen = true;
   bool target_refresh_rate = true;
-  int sleep_cpu_microseconds = 0;
+  int total_frames = 240;
+  int sleep_cpu_milliseconds = 0;
+  int width = 1280;
+  int height = 720;
   double display_scale = 1.0;
   double gpu_workload_ms = 1000 / 60.0;
 
@@ -205,8 +217,17 @@ int main(int argc, char* argv[]) {
       target_refresh_rate = true;
     } else if (arg == "--no-target-refresh-rate") {
       target_refresh_rate = false;
-    } else if (arg == "--sleep-cpu-microseconds" && (i + 1) < argc) {
-      sleep_cpu_microseconds = std::stoi(argv[i + 1]);
+    } else if (arg == "--sleep-cpu-milliseconds" && (i + 1) < argc) {
+      sleep_cpu_milliseconds = std::stod(argv[i + 1]);
+      ++i;
+    } else if (arg == "--total-frames" && (i + 1) < argc) {
+      total_frames = std::stod(argv[i + 1]);
+      ++i;
+    } else if (arg == "--width" && (i + 1) < argc) {
+      width = std::stoi(argv[i + 1]);
+      ++i;
+    } else if (arg == "--height" && (i + 1) < argc) {
+      height = std::stoi(argv[i + 1]);
       ++i;
     } else if (arg == "--display-scale" && (i + 1) < argc) {
       display_scale = std::stod(argv[i + 1]);
@@ -222,10 +243,13 @@ int main(int argc, char* argv[]) {
   }
   std::cout << "Settings: "
             << "\nvsync=" << (vsync ? "True" : "False")
+            << "\nwidth=" << width
+            << "\nheight=" << height
+            << "\ntotal_frames=" << total_frames
             << "\nfullscreen=" << (fullscreen ? "True" : "False")
             << "\ntarget_refresh_rate=" << (target_refresh_rate ?
                                             "True" : "False")
-            << "\nsleep_cpu_microseconds=" << sleep_cpu_microseconds
+            << "\nsleep_cpu_milliseconds=" << sleep_cpu_milliseconds
             << "\ndisplay_scale=" << display_scale
             << "\ngpu_workload_ms=" << gpu_workload_ms
             << std::endl;
@@ -237,7 +261,10 @@ int main(int argc, char* argv[]) {
   struct waffle_context *ctx;
   // Enable or disable vsync
   int swap_interval = vsync ? 1 : 0;
-  CreateContext(&display, &config, &window, &ctx, swap_interval);
+
+  width = static_cast<int>(floor(width * display_scale));
+  height = static_cast<int>(floor(height * display_scale));
+  CreateContext(&display, &config, &window, &ctx, swap_interval, width, height);
 
   int error = 0;
   auto shader_program = CreateShader(&error);
@@ -249,9 +276,6 @@ int main(int argc, char* argv[]) {
 
   // String format floating points to 4 decimal places.
   std::cout << std::fixed << std::setprecision(4);
-
-  // Set number of frames to test.
-  int total_frames = 1000;
   std::vector<double> cpu_times(total_frames);
 
   // Set up workload class.
@@ -278,6 +302,9 @@ int main(int argc, char* argv[]) {
   }
   // Adjust the workload so the gpu spends gpu_workload_ms rendering a frame.
   workload->CalibrateWorkload(gpu_workload_ms);
+  waffle_window_swap_buffers(window);
+  waffle_window_swap_buffers(window);
+  waffle_window_swap_buffers(window);
 
   // Display loop.
   auto first_time = steady_clock::now();
@@ -292,29 +319,42 @@ int main(int argc, char* argv[]) {
     if (cpu_times[frame] > gpu_workload_ms * 1.5) {
       // TODO(mrfemi): consider this a dropped frame and mark somehow
       // But this can also be processed from the logs.
-      workload->DecreaseWorkload();
+      workload->DecreaseWorkload(/*record_quads=*/true);
     }
 
-    workload->StartTimer(frame);
-    workload->Draw();
-    workload->EndTimer();
+    // Do not bother drawing if sleep_cpu_milliseconds has been set.
+    if (sleep_cpu_milliseconds == 0) {
+      workload->StartTimer(frame);
+      workload->Draw();
+      workload->EndTimer();
+    } else {
+      std::this_thread::sleep_for(milliseconds(sleep_cpu_milliseconds));
+    }
 
     waffle_window_swap_buffers(window);
   }
   auto current_time = steady_clock::now();
-  auto total_time = std::chrono::duration_cast<seconds>(
+  auto total_time = duration<double>(
       current_time - first_time).count();
 
+  // Print performance numbers to stdout.
+  workload->PrintQuadHistory();
   for (int i = 0; i < total_frames; ++i) {
     std::cout << "frame " << i << ": "
               << "cpu_elapsed_time: " << cpu_times[i] << " ms" << std::endl;
+    if (sleep_cpu_milliseconds > 0) {
+      std::cout << "frame sleep: "
+                << sleep_cpu_milliseconds << " ms" << std::endl;
+      continue;
+    }
     auto gpu_elapsed_time = workload->GetFrameGpuTime(i);
     std::cout << "frame " << i << ": "
               << "gpu_elapsed_time: " << gpu_elapsed_time << " ms" << std::endl;
   }
+  workload->TakeDown();
 
   std::cout << "Avg: " << total_frames / total_time << " fps for "
-            << std::chrono::seconds(total_time).count() << " secs. "
+            << total_time << " secs. "
             << total_frames << " frames rendered." << std::endl;
   return 0;
 }

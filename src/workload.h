@@ -27,6 +27,8 @@ class Workload {
   void UpdateWorkload(int num_quads);
 
   std::vector<GLuint> queries_;
+  std::vector<int> quad_counts_;
+  int num_throttles_ = 0;
   int num_quads_ = 100;
   double gpu_workload_precision_ = 0.99f;
   double gpu_workload_increase_ = 1.1;
@@ -53,7 +55,7 @@ class Workload {
   // Updates num_quads so that gpu_workload_ms of work is done on the GPU.
   void CalibrateWorkload(double gpu_workload_ms);
   void IncreaseWorkload();
-  void DecreaseWorkload();
+  void DecreaseWorkload(bool record_quads = false);
   // Use the timers to measure how much time was spent on the GPU.
   // Start the timer. Must be followed by EndTimer() before it can be called
   // again. Use GetFrameGpuTime() to get the elapsed time for that time.
@@ -63,6 +65,8 @@ class Workload {
   // Get the time spent on the GPU for a particular frame. Must have called
   // StartTimer()/EndTimer() for that frame or value wiill be wrong.
   double GetFrameGpuTime(int frame);
+  // Print num_quads every time the workload was decreased.
+  void PrintQuadHistory();
   // Unset GL state and delete objects.
   void TakeDown();
 };
