@@ -1,4 +1,4 @@
-// Copyright (c) 2010 The Chromium OS Authors. All rights reserved.
+// Copyright 2010 The ChromiumOS Authors
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -62,11 +62,11 @@ void* MmapFile(const char* name, size_t* length) {
 }
 
 void printDateTime() {
-  char            fmt[64], time_string[64];
-  struct timeval  tv;
-  struct tm       *tm;
+  char fmt[64], time_string[64];
+  struct timeval tv;
+  struct tm* tm;
   gettimeofday(&tv, NULL);
-  if((tm = localtime(&tv.tv_sec)) != NULL){
+  if ((tm = localtime(&tv.tv_sec)) != NULL) {
     strftime(fmt, sizeof fmt, "%a %b %e %H:%M:%S.%%06u %Y", tm);
     snprintf(time_string, sizeof time_string, fmt, tv.tv_usec);
     printf("# DateTime: %s\n", time_string);
@@ -95,13 +95,21 @@ bool read_float_from_cmd_output(const char* command, double* value) {
     printf("Error: could not popen command. (%s)\n", command);
     return false;
   }
-  int count = fscanf(fd, "%lf", value);
-  if (count != 1) {
-    printf("Error: could not read float from command output. (%s)\n", command);
-    return false;
+
+  char buffer[4096];
+  bool ret = false;
+  while (fgets(buffer, sizeof(buffer), fd) != NULL) {
+    int count = sscanf(buffer, "%lf", value);
+    if (count == 1) {
+      ret = true;
+      break;
+    }
   }
   pclose(fd);
-  return true;
+  if (ret == false) {
+    printf("Error: could not read float from command output. (%s)\n", command);
+  }
+  return ret;
 }
 
 bool check_file_existence(const char* file_path, struct stat* buffer = NULL) {
