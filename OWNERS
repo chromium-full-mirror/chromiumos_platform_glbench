@@ -1,4 +1,1 @@
-marcheu@chromium.org
-ihf@chromium.org
-pwang@chromium.org
-olv@chromium.org
+include chromiumos/platform/graphics:/OWNERS
