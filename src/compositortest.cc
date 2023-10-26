@@ -155,7 +155,8 @@ void CreateContext(
   struct waffle_context **ctx,
   int swap_interval,
   int window_width,
-  int window_height) {
+  int window_height,
+  bool fullscreen) {
   const int32_t init_attrs[] = {
       WAFFLE_PLATFORM, PLATFORM_TYPE,
       0,
@@ -176,7 +177,12 @@ void CreateContext(
   *display = waffle_display_connect(NULL);
 
   *config = waffle_config_choose(*display, config_attrs);
-  *window = waffle_window_create(*config, window_width, window_height);
+  if (fullscreen) {
+    const intptr_t attrib[] = {WAFFLE_WINDOW_FULLSCREEN, 1, 0};
+    *window = waffle_window_create2(*config, attrib);
+  } else {
+    *window = waffle_window_create(*config, window_width, window_height);
+  }
 
   waffle_window_show(*window);
   *ctx = waffle_context_create(*config, NULL);
@@ -194,7 +200,7 @@ int main(int argc, char* argv[]) {
   // TODO(mrfemi): parse workload scale from command line. At least as a
   // parameter. (0.99f)
   bool vsync = true;
-  bool fullscreen = true;
+  bool fullscreen = false;
   bool target_refresh_rate = true;
   int total_frames = 240;
   int sleep_cpu_milliseconds = 0;
@@ -264,7 +270,8 @@ int main(int argc, char* argv[]) {
 
   width = static_cast<int>(floor(width * display_scale));
   height = static_cast<int>(floor(height * display_scale));
-  CreateContext(&display, &config, &window, &ctx, swap_interval, width, height);
+  CreateContext(&display, &config, &window, &ctx, swap_interval, width, height,
+                fullscreen);
 
   int error = 0;
   auto shader_program = CreateShader(&error);
