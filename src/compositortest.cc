@@ -12,6 +12,9 @@
 #include <thread>
 #include <vector>
 #include <waffle.h>
+#include <X11/Xatom.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
 #include "workload.h"
 
@@ -45,6 +48,10 @@ precision mediump float;
 
 )STRING";
 #else
+#define _NET_WM_STATE_REMOVE  0
+#define _NET_WM_STATE_ADD 1
+#define _NET_WM_STATE_TOGGLE  2
+
 #define PLATFORM_API WAFFLE_CONTEXT_OPENGL
 #define PLATFORM_TYPE WAFFLE_PLATFORM_GLX
 
@@ -164,12 +171,12 @@ void CreateContext(
 
   const int32_t config_attrs[] = {
                              WAFFLE_CONTEXT_API, PLATFORM_API,
-                             WAFFLE_RED_SIZE, 1,
-                             WAFFLE_GREEN_SIZE, 1,
-                             WAFFLE_BLUE_SIZE, 1,
-                             WAFFLE_ALPHA_SIZE, 1,
-                             WAFFLE_DEPTH_SIZE, 1,
-                             WAFFLE_STENCIL_SIZE, 1,
+                             WAFFLE_RED_SIZE, 8,
+                             WAFFLE_GREEN_SIZE, 8,
+                             WAFFLE_BLUE_SIZE, 8,
+                             WAFFLE_ALPHA_SIZE, 8,
+                             WAFFLE_DEPTH_SIZE, 8,
+                             WAFFLE_STENCIL_SIZE, 8,
                              WAFFLE_DOUBLE_BUFFERED, true,
                              0};
 
@@ -180,6 +187,29 @@ void CreateContext(
   if (fullscreen) {
     const intptr_t attrib[] = {WAFFLE_WINDOW_FULLSCREEN, 1, 0};
     *window = waffle_window_create2(*config, attrib);
+
+#if defined(USE_OPENGL)
+    struct waffle_glx_window *window_glx =
+        waffle_window_get_native(*window)->glx;
+    Display *display_x11 = window_glx->xlib_display;
+    Window window_x11 = (Window) window_glx->xlib_window;
+
+    XEvent ev;
+    Atom atom;
+
+    ev.type = ClientMessage;
+    ev.xclient.window = window_x11;
+    ev.xclient.send_event = True;
+    ev.xclient.message_type = XInternAtom(display_x11, "_NET_WM_STATE", False);
+    ev.xclient.format = 32;
+    ev.xclient.data.l[0] = _NET_WM_STATE_ADD;
+    atom = XInternAtom(display_x11, "_NET_WM_STATE_FULLSCREEN", False);
+    ev.xclient.data.l[1] = atom;
+    ev.xclient.data.l[2] = 0;
+    ev.xclient.data.l[3] = 1;
+    XSendEvent(display_x11, DefaultRootWindow(display_x11), False,
+        SubstructureNotifyMask | SubstructureRedirectMask, &ev);
+#endif
   } else {
     *window = waffle_window_create(*config, window_width, window_height);
   }
@@ -187,6 +217,7 @@ void CreateContext(
   waffle_window_show(*window);
   *ctx = waffle_context_create(*config, NULL);
   waffle_make_current(*display, *window, *ctx);
+
 #if defined (USE_OPENGLES)
   eglSwapInterval(waffle_display_get_native(*display)->null->egl_display,
       swap_interval);
@@ -272,7 +303,6 @@ int main(int argc, char* argv[]) {
   height = static_cast<int>(floor(height * display_scale));
   CreateContext(&display, &config, &window, &ctx, swap_interval, width, height,
                 fullscreen);
-
   int error = 0;
   auto shader_program = CreateShader(&error);
   std::cout << "Platform OpenGL version: "
