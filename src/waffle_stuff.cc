@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include "main.h"
+#include "platform.h"
 #include "utils.h"
 #include "waffle_stuff.h"
 
@@ -27,15 +28,6 @@ LIST_PROC_FUNCTIONS(F)
 #else
 #define GL_API WAFFLE_CONTEXT_OPENGL_ES2
 #endif
-
-#define ID_PLATFORM_GLX 1
-#define ID_PLATFORM_X11_EGL 2
-#define ID_PLATFORM_NULL 3
-
-#define CONCAT(a, b) a##b
-#define PLATFORM_ID(x) CONCAT(ID_, x)
-#define PLATFORM_ENUM(x) CONCAT(WAFFLE_, x)
-#define THIS_IS(x) PLATFORM_ID(x) == PLATFORM_ID(PLATFORM)
 
 #if THIS_IS(PLATFORM_GLX)
 #include "waffle_glx.h"
