@@ -5,18 +5,14 @@
 #ifndef COMPOSITOR_GL_WORKLOAD_H_
 #define COMPOSITOR_GL_WORKLOAD_H_
 
-#if defined(USE_OPENGLES)
-#include <epoxy/gl.h>
-#include <epoxy/egl.h>
-#include "waffle_null.h"
+#include "platform.h"
 
-#elif defined(USE_OPENGL)
 #include <epoxy/gl.h>
+
+#if THIS_IS(PLATFORM_GLX)
 #include <epoxy/glx.h>
-#include "waffle_glx.h"
-
-#else
-#error bad graphics backend
+#else // EGL platforms
+#include <epoxy/egl.h>
 #endif
 
 #define NS_TO_MS(x) x / 1000000.0

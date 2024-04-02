@@ -12,31 +12,29 @@
 #include <thread>
 #include <vector>
 #include <waffle.h>
+
+#include "platform.h"
+#include "workload.h"
+
+#if THIS_IS(PLATFORM_GLX)
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-#include "workload.h"
-
-#if defined(USE_OPENGLES)
-#include <epoxy/gl.h>
-#include <epoxy/egl.h>
-#include "waffle_null.h"
-
-#elif defined(USE_OPENGL)
-#include <epoxy/gl.h>
-#include <epoxy/glx.h>
 #include "waffle_glx.h"
-
-#else
-#error bad graphics backend
+#define PLATFORM_TYPE WAFFLE_PLATFORM_GLX
+#elif THIS_IS(PLATFORM_NULL)
+#include "waffle_null.h"
+#define PLATFORM_TYPE WAFFLE_PLATFORM_NULL
+#elif THIS_IS(PLATFORM_X11_EGL)
+#include "waffle_x11_egl.h"
+#define PLATFORM_TYPE WAFFLE_PLATFORM_X11_EGL
 #endif
 
 using namespace std::chrono;
 
 #if defined(USE_OPENGLES)
 #define PLATFORM_API WAFFLE_CONTEXT_OPENGL_ES2
-#define PLATFORM_TYPE WAFFLE_PLATFORM_NULL
 const std::string kVertexHeader = R"STRING(
 #version 320 es
 
@@ -53,7 +51,6 @@ precision mediump float;
 #define _NET_WM_STATE_TOGGLE  2
 
 #define PLATFORM_API WAFFLE_CONTEXT_OPENGL
-#define PLATFORM_TYPE WAFFLE_PLATFORM_GLX
 
 const std::string kVertexHeader = R"STRING(
 #version 430 core
@@ -188,7 +185,7 @@ void CreateContext(
     const intptr_t attrib[] = {WAFFLE_WINDOW_FULLSCREEN, 1, 0};
     *window = waffle_window_create2(*config, attrib);
 
-#if defined(USE_OPENGL)
+#if THIS_IS(PLATFORM_GLX)
     struct waffle_glx_window *window_glx =
         waffle_window_get_native(*window)->glx;
     Display *display_x11 = window_glx->xlib_display;
@@ -218,12 +215,15 @@ void CreateContext(
   *ctx = waffle_context_create(*config, NULL);
   waffle_make_current(*display, *window, *ctx);
 
-#if defined (USE_OPENGLES)
-  eglSwapInterval(waffle_display_get_native(*display)->null->egl_display,
-      swap_interval);
-#elif defined (USE_OPENGL)
-  glXSwapIntervalEXT(waffle_display_get_native(*display)->glx->xlib_display,
+  union waffle_native_display *native_display =
+      waffle_display_get_native(*display);
+#if THIS_IS(PLATFORM_GLX)
+  glXSwapIntervalEXT(native_display->glx->xlib_display,
       glXGetCurrentDrawable(), swap_interval);
+#elif THIS_IS(PLATFORM_NULL)
+  eglSwapInterval(native_display->null->egl_display, swap_interval);
+#elif THIS_IS(PLATFORM_X11_EGL)
+  eglSwapInterval(native_display->x11_egl->egl_display, swap_interval);
 #endif
 }
 
