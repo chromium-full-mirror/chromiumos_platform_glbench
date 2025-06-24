@@ -174,6 +174,7 @@ void RunTest(TestBase* test,
   // Results are marked using a leading '@RESULT: ' to allow parsing.
   printf("@RESULT: %-*s = %10.2f %-15s [%s]\n", MAX_TESTNAME, testname, value,
          test->Unit(), name_png);
+  fflush(stdout);
 }
 
 bool DrawArraysTestFunc::TestFunc(uint64_t iterations) {
